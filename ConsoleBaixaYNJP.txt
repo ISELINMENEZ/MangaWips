@@ -1,0 +1,24 @@
+(() => {
+  const originalCreateObjectURL = URL.createObjectURL;
+  let count = 0;
+
+  URL.createObjectURL = function(blob) {
+    try {
+      const a = document.createElement('a');
+      const url = originalCreateObjectURL.call(URL, blob);
+      a.href = url;
+      a.download = `${count++}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      console.log("✅ Blob capturado e baixado.");
+      return url;
+    } catch (err) {
+      console.error("Erro ao interceptar blob:", err);
+      return originalCreateObjectURL.call(URL, blob);
+    }
+  };
+
+  console.log("✅ Interceptador de blobs ativado. Recarregue ou navegue pelas páginas para capturar as imagens.");
+})();
